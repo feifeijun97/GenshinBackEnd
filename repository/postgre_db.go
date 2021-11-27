@@ -1,73 +1,44 @@
 package repository
 
 import (
-	"context"
-	"database/sql"
 	"fmt"
 	"os"
 
-	"github.com/uptrace/bun/dialect/pgdialect"
-	"github.com/uptrace/bun/driver/pgdriver"
-
-	_ "github.com/joho/godotenv/autoload"
-	"github.com/uptrace/bun"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
-//Connect To PostgreSQL db using dotenv db credentials
-// func ConnectToPostgreSQL() {
-// 	//declare the psql info for connecting db
-// 	dbPort, _ := strconv.Atoi(os.Getenv("DB_PORT"))
-
-// 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-// 		"password=%s dbname=%s sslmode=disable",
-// 		os.Getenv("DB_HOST"), dbPort, os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"))
-
-// 	db, err := sql.Open("postgres", psqlInfo)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	defer db.Close()
-
-// 	err = db.Ping()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	fmt.Println("Successfully connected!")
-// }
+var Conn *gorm.DB
 
 func ConnectToPostgreDb() {
-	context := context.Background()
+	// context := context.Background()
 
 	// create a dsn for postgre DB
 	// the format of dsn can refer to : https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
+	// pgxConn, err := pgx.Connect(context, dsn)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// Conn = pgxConn
+	// fmt.Println("Successfully establish database connection")
 
-	pq_db := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
+	// // defer Conn.Close(context)
 
-	//close the db at at last using defer
-	defer pq_db.Close()
-
-	db := bun.NewDB(pq_db, pgdialect.New())
-
-	//set the table name to singular (disable automatically add 's' after the table name)
-	character := new(Character)
-	if err := db.NewSelect().Model(character).
-		Where("id = ?", 1).Scan(context); err != nil {
+	// establish new database connection using GORM
+	// configure the table name as singular, default is plural
+	pgxConn, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true,
+		},
+	})
+	if err != nil {
 		panic(err)
 	}
 
-	fmt.Print(character.String())
-}
+	Conn = pgxConn
+	fmt.Println("Successfully establish database connection using gorm")
 
-type Character struct {
-	bun.BaseModel `bun:"character,alias:c"`
-	ID            int64
-	Name          string
-}
-
-func (c Character) String() string {
-	return fmt.Sprintf("Character<%d %s>", c.ID, c.Name)
 }

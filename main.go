@@ -1,7 +1,7 @@
 package main
 
 import (
-	"GenshinBackEnd/repository"
+	// "github.com/feifeijun97/GenshinBackEnd/repository"
 
 	"log"
 	"net/http"
@@ -9,6 +9,8 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 
+	"github.com/feifeijun97/GenshinBackEnd/modules/character"
+	"github.com/feifeijun97/GenshinBackEnd/repository"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -26,6 +28,9 @@ func apiRouter() *chi.Mux {
 
 func main() {
 	repository.ConnectToPostgreDb()
+	c := character.Character{}
+
+	c.GetCharacterById(1)
 	//listen to API request from client
 	router := apiRouter()
 
