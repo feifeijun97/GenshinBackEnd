@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package character;
+
+//defind the output path where the .pb.go & _grpc.pb.go will be generated
+option go_package="./modules/character/characterpb";
+
+message CharacterListRequest{
+    enum Regions{
+        ALL_REGION = 0;
+        MONDSTAT = 1;
+        LIYUE = 2;
+        INAZUMA = 3;
+    };
+    enum Weapons{
+        ALL_WEAPON = 0;
+        SWORD = 1;
+        CLAYMORE = 2;
+        BOW = 3;
+        POLEARM = 4;
+        CATALYST = 5;
+    }
+    enum Visions{
+        ALL_VISION = 0;
+        PYRO = 1;
+        CYRO = 2;
+        ELECTRO = 3;
+        HYDRO = 4;
+        ANEMO = 5;
+        GEO = 6;
+        DENDRO = 7;
+    }
+    optional string name = 1;
+    optional Regions region = 2;
+    optional int32 rarity = 3;
+    optional Weapons Weapon =4;
+    optional Visions Vision = 5;
+}
+
+message CharacterListResponse{
+    enum Visions{
+        ALL_VISION = 0;
+        PYRO = 1;
+        CYRO = 2;
+        ELECTRO = 3;
+        HYDRO = 4;
+        ANEMO = 5;
+        GEO = 6;
+        DENDRO = 7;
+    }
+    string id = 1;
+    string name = 2;
+    int32 rarity = 3;
+    Visions vision = 4;
+    string imageUrl = 5;
+}
+
+service CharacterListService{
+    rpc CharacterList(CharacterListRequest) returns (CharacterListResponse);
+}

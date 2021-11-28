@@ -3,36 +3,45 @@ package main
 import (
 	// "github.com/feifeijun97/GenshinBackEnd/repository"
 
+	"fmt"
 	"log"
-	"net/http"
-	"os"
+	"net"
 
 	_ "github.com/joho/godotenv/autoload"
+	"google.golang.org/grpc"
 
-	"github.com/feifeijun97/GenshinBackEnd/modules/character"
+	"github.com/feifeijun97/GenshinBackEnd/modules/character/characterpb"
 	"github.com/feifeijun97/GenshinBackEnd/repository"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
 //handle the routes for API request
-func apiRouter() *chi.Mux {
-	router := chi.NewRouter()
-	router.Use(middleware.Logger)
-	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("welcome"))
-	})
+// func apiRouter() *chi.Mux {
+// 	router := chi.NewRouter()
+// 	router.Use(middleware.Logger)
+// 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
+// 		w.Write([]byte("welcome"))
+// 	})
 
-	return router
+// 	return router
+// }
+
+type server struct {
+	characterpb.UnimplementedCharacterListServiceServer
 }
 
 func main() {
 	repository.ConnectToPostgreDb()
-	c := character.Character{}
+	// c := character.Character{}
 
-	c.GetCharacterById(1)
-	//listen to API request from client
-	router := apiRouter()
+	lis, err := net.Listen("tcp", "0.0.0.0:50051")
+	if err != nil {
+		log.Fatalf("failed to lsiten: %v", err)
+	}
+	fmt.Println("Successfully establish server on 0.0.0.0:50051")
 
-	log.Fatal(http.ListenAndServe(os.Getenv("APP_PORT"), router))
+	s := grpc.NewServer()
+	characterpb.RegisterCharacterListServiceServer(s, &server{})
+	if err = s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
 }
