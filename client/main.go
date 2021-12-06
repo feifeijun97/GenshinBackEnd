@@ -21,7 +21,7 @@ var (
 
 func main() {
 	fmt.Println("im client")
-	conn, err := grpc.Dial("localhost:50052", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
 	if err != nil {
 		panic(err)
 	}
@@ -37,9 +37,4 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(r.GetName())
-}
-
-func CharacterList(ctx context.Context, in *characterpb.CharacterListRequest) (*characterpb.CharacterListResponse, error) {
-	fmt.Println("Received a request: ", in.GetName())
-	return &characterpb.CharacterListResponse{Name: "Amber"}, nil
 }

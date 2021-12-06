@@ -3,6 +3,7 @@ package main
 import (
 	// "github.com/feifeijun97/GenshinBackEnd/repository"
 
+	"context"
 	"fmt"
 	"log"
 	"net"
@@ -44,4 +45,9 @@ func main() {
 	if err = s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+}
+
+func (s *server) CharacterList(ctx context.Context, in *characterpb.CharacterListRequest) (*characterpb.CharacterListResponse, error) {
+	fmt.Println("Received a request: ", in.GetName())
+	return &characterpb.CharacterListResponse{Name: "Amber"}, nil
 }
