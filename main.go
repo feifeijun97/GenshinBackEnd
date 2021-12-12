@@ -17,6 +17,7 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"google.golang.org/grpc"
 
+	"github.com/feifeijun97/GenshinBackEnd/modules/character"
 	"github.com/feifeijun97/GenshinBackEnd/modules/character/characterpb"
 	"github.com/feifeijun97/GenshinBackEnd/repository"
 )
@@ -39,6 +40,9 @@ type server struct {
 func main() {
 	repository.ConnectToPostgreDb()
 	// c := character.Character{}
+	// c.GetCharacterById(1)
+	// fmt.Println(c)
+	character.GenerateCharactersFromJson("src/data/english/characters")
 
 	// host a HTTP server at 3000
 	r := chi.NewRouter()
