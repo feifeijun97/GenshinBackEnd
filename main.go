@@ -42,8 +42,9 @@ func main() {
 	// c := character.Character{}
 	// c.GetCharacterById(1)
 	// fmt.Println(c)
-	character.GenerateCharactersFromJson("src/data/english/characters")
-
+	// character.GenerateCharactersFromJson("src/data/english/characters")
+	character.CreateCharacterPotraitImages("C:\\Users\\user\\Downloads\\api-mistress")
+	os.Exit(1)
 	// host a HTTP server at 3000
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)

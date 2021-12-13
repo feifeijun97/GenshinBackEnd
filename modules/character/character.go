@@ -3,6 +3,7 @@ package character
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 
@@ -17,8 +18,12 @@ const (
 	UnknownCode int    = 2
 )
 
+const (
+	POTRAIT = 1
+)
+
 type Character struct {
-	ID           int64
+	ID           int
 	Name         string
 	Title        string `gorm:"column:title"`
 	Description  string
@@ -45,6 +50,14 @@ type CharacterJson struct {
 	Element     string `json:"element"`
 	Gender      string `json:"gender"`
 	Birthday    []int  `json:"birthday"`
+}
+
+type ImageStorage struct {
+	Table      string
+	TableValue int
+	Type       int8
+	Location   string
+	FileName   string
 }
 
 type Element struct {
@@ -157,6 +170,49 @@ func convertToDbStruct(cj CharacterJson) Character {
 
 	return c
 
+}
+
+func CreateCharacterPotraitImages(assetFolderPath string) {
+	characters := []Character{}
+	tx := repository.Conn.Find(&characters)
+	if tx.Error != nil {
+		panic(tx.Error)
+	}
+
+	for _, c := range characters {
+		imageUrl := assetFolderPath + "\\assets\\images\\characters\\" + c.Name + "\\portrait"
+		_, err := os.Stat(imageUrl)
+		if err != nil {
+			continue
+		}
+		source, err := os.Open(imageUrl)
+		if err != nil {
+			panic(err)
+		}
+
+		//create folder
+		destDir := "src/images/characters/" + c.Name
+		err = os.Mkdir(destDir, 0777)
+		if err != nil {
+			panic(err)
+		}
+
+		fileName := "potrait.jpg"
+		destDir += "/" + fileName
+		dest, err := os.Create(destDir)
+		if err != nil {
+			panic(err)
+		}
+		io.Copy(dest, source)
+		imgStorage := ImageStorage{Table: "character", TableValue: c.ID, Location: destDir, FileName: fileName, Type: POTRAIT}
+
+		tx = repository.Conn.Create(imgStorage)
+		if tx.Error != nil {
+			panic(tx.Error)
+		}
+		source.Close()
+		dest.Close()
+	}
 }
 
 // func tableName() string {
