@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/feifeijun97/GenshinBackEnd/modules/character/characterpb"
 	"github.com/feifeijun97/GenshinBackEnd/repository"
 )
 
@@ -36,6 +37,15 @@ type Character struct {
 	RegionId     int    `gorm:"column:region_id"`
 	Substat      string
 	Rarity       int
+}
+
+type ApiCharacter struct {
+	ID        int
+	Name      string
+	ElementId int `gorm:"column:element_id"`
+	Gender    int8
+	Rarity    int
+	ImageUrl  string
 }
 
 type CharacterJson struct {
@@ -213,6 +223,27 @@ func CreateCharacterPotraitImages(assetFolderPath string) {
 		source.Close()
 		dest.Close()
 	}
+}
+
+func GetCharaacterList(in *characterpb.CharacterListRequest) []*characterpb.Character {
+	// var characters []Character
+	var characters []*characterpb.Character
+
+	// tx := repository.Conn.Find(&characters)
+	tx := repository.Conn.Raw("SELECT c.id, c.name, c.rarity, c.element_id, c.gender, i.location as imageUrl FROM character c, image_storage i WHERE c.id = i.table_value AND i.table='character' AND c.deleted_at IS NULL").Scan(characters)
+	if tx.Error != nil {
+		panic(tx.Error)
+	}
+
+	fmt.Println(characters)
+
+	// for _,c := range characters{
+	// 	// characterpb.Visions
+	// 	characterpb.Visions_ANEMO
+	// }
+
+	return characters
+
 }
 
 // func tableName() string {

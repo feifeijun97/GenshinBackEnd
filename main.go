@@ -17,6 +17,7 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"google.golang.org/grpc"
 
+	"github.com/feifeijun97/GenshinBackEnd/modules/character"
 	"github.com/feifeijun97/GenshinBackEnd/modules/character/characterpb"
 	"github.com/feifeijun97/GenshinBackEnd/repository"
 )
@@ -43,7 +44,7 @@ func main() {
 	// fmt.Println(c)
 	// character.GenerateCharactersFromJson("src/data/english/characters")
 	// character.CreateCharacterPotraitImages("C:\\Users\\user\\Downloads\\api-mistress")
-	// os.Exit(1)	
+	// os.Exit(1)
 	// host a HTTP server at 3000
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -83,7 +84,9 @@ func main() {
 
 func (s *server) CharacterList(ctx context.Context, in *characterpb.CharacterListRequest) (*characterpb.CharacterListResponse, error) {
 	fmt.Println("Received a request: ", in.GetName())
-	return &characterpb.CharacterListResponse{Name: "Amber"}, nil
+	c := character.GetCharaacterList(in)
+
+	return &characterpb.CharacterListResponse{Characters: c}, nil
 }
 
 // CHI ROUTE functions

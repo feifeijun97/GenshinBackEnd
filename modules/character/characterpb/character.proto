@@ -38,22 +38,31 @@ enum Gender{
     MALE = 0;
     FEMALE = 1;
 }
-message CharacterListRequest{
-    optional string name = 1;
-    optional Regions region = 2;
-    optional int32 rarity = 3;
-    optional WeaponTypes WeaponType = 4;
-    optional Visions Vision = 5;
-}
 
-message CharacterListResponse{
-    string id = 1;
+message Character{
+    int32 id = 1;
     string name = 2;
     int32 rarity = 3;
     Visions vision = 4;
     string imageUrl = 5;
     Gender gender = 6;
 }
+
+message CharacterListRequest{
+    optional string name = 1;
+    optional Regions region = 2;
+    optional int32 rarity = 3;
+    optional WeaponTypes WeaponType = 4;
+    optional Visions Vision = 5;
+    optional int32 lastId = 6; // lazy load, pass in the last id , prevent server return similar characters
+}
+
+message CharacterListResponse{
+    repeated Character characters = 1;
+}
+
+
+
 
 service CharacterListService{
     rpc CharacterList(CharacterListRequest) returns (CharacterListResponse);

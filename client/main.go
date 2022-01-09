@@ -32,9 +32,9 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	r, err := c.CharacterList(ctx, &characterpb.CharacterListRequest{Name: name})
+	r, err := c.CharacterList(ctx, &characterpb.CharacterListRequest{})
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(r.GetName())
+	fmt.Println(r)
 }
